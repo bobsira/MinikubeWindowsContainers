@@ -23,7 +23,7 @@ function Install-Containerd {
 
     $Version = $Version.TrimStart('v')
     Write-Output "* Downloading and installing Containerd v$version at $InstallPath"
-    "Downloading and installing Containerd v$version at $InstallPath" >> logs
+    "{0} - Downloading and installing Containerd v$version at $InstallPath" -f (Get-Date) >> logs
 
     
     # Download file from repo
@@ -50,10 +50,10 @@ function Install-Containerd {
     Install-RequiredFeature @params | Out-Null
 
     Write-Output "* Containerd v$version successfully installed at $InstallPath"
-    "Containerd v$version successfully installed at $InstallPath" >> logs
+    "{0} Containerd v$version successfully installed at $InstallPath" -f (Get-Date) >> logs
     containerd.exe -v >> logs
 
-    "For containerd usage: run 'containerd -h'" >> logs
+    "{0} - For containerd usage: run 'containerd -h'" -f (Get-Date) >> logs
 }
 
 function Start-ContainerdService {
@@ -69,7 +69,7 @@ function Start-ContainerdService {
     } 
 
     Write-Output "* Containerd is installed and the service is started  ..."
-    "Containerd is installed and the service is started" >> logs
+    "{0} - Containerd is installed and the service is started" -f (Get-Date) >> logs
 
 }
 
@@ -77,7 +77,7 @@ function Stop-ContainerdService {
     $containerdStatus = Get-Service containerd -ErrorAction SilentlyContinue
     if (!$containerdStatus) {
         Write-Warning "Containerd service does not exist as an installed service."
-        "Containerd service does not exist as an installed service." >> logs
+        "{0} - Containerd service does not exist as an installed service." -f (Get-Date) >> logs
         return
     }
 
@@ -99,7 +99,7 @@ function Initialize-ContainerdService {
         $ContainerdPath = "$Env:ProgramFiles\containerd"
     )
 
-    "Configuring the containerd service" >> logs
+    "{0} - Configuring the containerd service" -f (Get-Date) >> logs
 
     #Configure containerd service
     $containerdConfigFile = "$ContainerdPath\config.toml"

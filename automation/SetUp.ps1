@@ -26,7 +26,7 @@ if ([string]::IsNullOrEmpty($KubernetesVersion)) {
 }
 
 
-"* Starting the $VMName Virtual Machine ..." > logs
+"{0} - * Starting the $VMName Virtual Machine ..." -f (Get-Date) > logs
 Write-Output "* Starting the $VMName Virtual Machine ..."
 
 $VM = @{
@@ -41,6 +41,7 @@ $VM = @{
 }
 
 Write-Output "* Please wait as we set up the $VMName Virtual Machine ..."
+"{0} - Please wait as we set up the $VMName Virtual Machine ..." -f (Get-Date) >> logs
 New-VM @VM | Out-Null
 Set-VM -Name $VMName -ProcessorCount 2 -AutomaticCheckpointsEnabled $false
 Set-VMProcessor -VMName $VMName -ExposeVirtualizationExtensions $true
@@ -56,7 +57,8 @@ $elapsedTime = 0
 
 do {
     Start-Sleep -Seconds $retryInterval
-    "Waiting for the VM to start ..." >> logs
+
+    "{0} - Waiting for the VM to start  ..." -f (Get-Date) >> logs
     $heartbeat = Get-VMIntegrationService -VMName $VMName -Name "Heartbeat"
     $elapsedTime += $retryInterval
 
@@ -76,6 +78,9 @@ $SecurePassword = ConvertTo-SecureString -String $Pass -AsPlainText -Force
 $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $UserName, $SecurePassword
 
 $VMStatus = Get-VM -Name $VMName | Select-Object -ExpandProperty State
+
+$VMName = Get-VM | Select-Object -ExpandProperty Name
+
 
 if ($VMStatus -eq 'Running') {
     
