@@ -9,14 +9,24 @@ function Run {
         [string]$UserName,
         [string]$Pass,
         [System.Management.Automation.PSCredential]$Credential,
-        [string]$KubernetesVersion
+        [string]$KubernetesVersion,
+        [ValidateSet("Hyper-V", "VirtualBox")]
+        [string]$Platform = "Hyper-V"
     ) 
 
     # create and configure a new minikube cluster 
     Write-Output "* Creating and configuring a new minikube cluster ..."
-    & minikube start --driver=hyperv --hyperv-virtual-switch=$SwitchName --nodes=2 --cni=flannel --container-runtime=containerd --kubernetes-version=$KubernetesVersion
-    # & minikube start --driver=hyperv --hyperv-virtual-switch=$SwitchName --memory=4096 --cpus=2 --kubernetes-version=v1.20.2 --network-plugin=cni --cni=flannel --container-runtime=containerd --disk-size=15GB --wait=false >> logs
-    Write-Output "* Minikube cluster is created and configured  ..."
+    if ($Platform -eq "Hyper-V") {
+        & minikube start --driver=hyperv --hyperv-virtual-switch=$SwitchName --nodes=2 --cni=flannel --container-runtime=containerd --kubernetes-version=$KubernetesVersion
+        # & minikube start --driver=hyperv --hyperv-virtual-switch=$SwitchName --memory=4096 --cpus=2 --kubernetes-version=v1.20.2 --network-plugin=cni --cni=flannel --container-runtime=containerd --disk-size=15GB --wait=false >> logs
+    }
+    elseif ($Platform -eq "Virtualbox") {
+        & minikube start --driver=virtualbox --nodes=2 --cni=flannel --container-runtime=containerd --kubernetes-version=$KubernetesVersion
+    } else {
+        Write-Output "Unsupported platform: $Platform"
+        return
+    }
+        Write-Output "* Minikube cluster is created and configured  ..."
     # Prepare the Linux nodes for Windows-specific Flannel CNI configuration
     # at the moment we are assuming that you only have two linux nodes named minikube and minikube-m02
     & minikube ssh "sudo sysctl net.bridge.bridge-nf-call-iptables=1 && exit" >> logs

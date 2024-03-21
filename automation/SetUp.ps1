@@ -146,7 +146,7 @@ elseif($Platform -eq "VirtualBox"){
                     Write-Output "* Windows is successfully installed on $VMName"
                     "Windows is successfully installed on $VMName" >> logs
                     . .\Run.ps1
-                    RUN -VMName $VMName -UserName $UserName -Pass $Pass -Credential $Credential -KubernetesVersion $KubernetesVersion
+                    RUN -VMName $VMName -UserName $UserName -Pass $Pass -Credential $Credential -KubernetesVersion $KubernetesVersion -Platform $Platform
                     break
                 } else {
                     Write-Output "* Windows is not installed on $VMName"
